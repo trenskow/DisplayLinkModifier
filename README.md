@@ -18,10 +18,18 @@ struct MyTimeView: View {
 	
 	var body: some View {
 		Text("Time elapsed: \(self.timeStamp - self.startTime)")
-			.displayLink($timeStamp)
+			.displayLink(timeStamp: $timeStamp)
 	}
 	
 }
+````
+
+## Note about 120 hz frame rate
+
+If you need 120 hz updates as on never iPhones, you need to add this to your `Info.plist`.
+
+````
+<key>CADisableMinimumFrameDurationOnPhone</key><true/>
 ````
 
 # License
