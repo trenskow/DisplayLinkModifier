@@ -1,7 +1,7 @@
 // swift-tools-version:6.0
 
 //
-//  Renderer.hpp
+//  Package.swift
 //  DisplayLinkModifier
 //
 //  Created by Kristian Trenskow on 10/11/2024.
