@@ -20,6 +20,5 @@ let package = Package(
 	targets: [
 		.target(
 			name: "DisplayLinkModifier")
-	],
-	cxxLanguageStandard: .cxx17
+	]
 )
