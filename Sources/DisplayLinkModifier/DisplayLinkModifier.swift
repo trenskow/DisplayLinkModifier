@@ -12,11 +12,14 @@ struct DisplayLinkView: UIViewRepresentable {
 	class Coordinator {
 
 		@Binding var timeStamp: TimeInterval
+		@Binding var targetTimeStamp: TimeInterval
 
 		init(
-			timeStamp: Binding<TimeInterval>
+			timeStamp: Binding<TimeInterval>,
+			targetTimeStamp: Binding<TimeInterval>
 		) {
 			self._timeStamp = timeStamp
+			self._targetTimeStamp = targetTimeStamp
 		}
 
 		var displayLink: CADisplayLink? {
@@ -33,24 +36,29 @@ struct DisplayLinkView: UIViewRepresentable {
 
 		@objc func update(sender: CADisplayLink) {
 			self.timeStamp = sender.timestamp
+			self.targetTimeStamp = sender.targetTimestamp
 		}
 
 	}
 
 	@Binding var timeStamp: TimeInterval
+	@Binding var targetTimeStamp: TimeInterval
 	private let preferredFramesPerSecond: Int
 
 	init(
 		timeStamp: Binding<TimeInterval>,
+		targetTimeStamp: Binding<TimeInterval>,
 		preferredFramesPerSecond: Int = 120
 	) {
 		self._timeStamp = timeStamp
+		self._targetTimeStamp = targetTimeStamp
 		self.preferredFramesPerSecond = preferredFramesPerSecond
 	}
 
 	func makeCoordinator() -> Coordinator {
 		return Coordinator(
-			timeStamp: $timeStamp)
+			timeStamp: $timeStamp,
+			targetTimeStamp: $targetTimeStamp)
 	}
 
 	func makeUIView(context: Context) -> some UIView {
@@ -80,33 +88,39 @@ struct DisplayLinkView: UIViewRepresentable {
 struct DisplayLink: ViewModifier {
 
 	@Binding var timeStamp: TimeInterval
+	@Binding var targetTimeStamp: TimeInterval
 	private let preferredFramesPerSecond: Int
 
 	init(
 		timeStamp: Binding<TimeInterval>,
-		preferredFramesPerSecond: Int = 120
+		targetTimeStamp: Binding<TimeInterval>,
+		preferredFramesPerSecond: Int
 	) {
 		self._timeStamp = timeStamp
+		self._targetTimeStamp = targetTimeStamp
 		self.preferredFramesPerSecond = preferredFramesPerSecond
 	}
 
 	func body(content: Content) -> some View {
-		content
-			.overlay {
-				DisplayLinkView(
-					timeStamp: $timeStamp,
-					preferredFramesPerSecond: self.preferredFramesPerSecond)
-			}
+		ZStack {
+			DisplayLinkView(
+				timeStamp: self.$timeStamp,
+				targetTimeStamp: self.$targetTimeStamp,
+				preferredFramesPerSecond: self.preferredFramesPerSecond)
+			content
+		}
 	}
 }
 
 extension View {
 	public func displayLink(
 		timeStamp: Binding<TimeInterval>,
+		targetTimeStamp: Binding<TimeInterval> = .constant(0),
 		preferredFramesPerSecond: Int = 120
 	) -> some View {
 		self.modifier(DisplayLink(
 			timeStamp: timeStamp,
+			targetTimeStamp: targetTimeStamp,
 			preferredFramesPerSecond: preferredFramesPerSecond))
 	}
 }
